@@ -1,0 +1,11 @@
+[package]
+name = "sigmaos-lxc"
+version = "0.1.0"
+edition = "2021"
+authors = ["SigmaOS Contributors"]
+description = "SigmaOS lxc component"
+license = "MIT OR Apache-2.0"
+
+[lib]
+name = "sigmaos_lxc"
+path = "src/lib.rs"
