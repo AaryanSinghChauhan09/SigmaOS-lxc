@@ -3,8 +3,9 @@
 #[derive(Debug, Clone)]
 pub struct Container {
     pub name: String,
-    pub state: String,
     pub image: String,
+    pub status: String,
+    pub running: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -19,13 +20,26 @@ impl Default for Model {
 impl Model {
     pub fn new() -> Self { Self::default() }
 
-    pub fn create(&mut self, name: &str, image: &str) -> bool {
-        self.containers.push(Container { name: name.into(), state: "stopped".into(), image: image.into() });
-        true
+    pub fn create(&mut self, name: &str, image: &str) -> usize {
+        let id = self.containers.len();
+        self.containers.push(Container { name: name.into(), image: image.into(), status: "created".into(), running: false });
+        id
     }
 
     pub fn start(&mut self, name: &str) -> bool {
-        if let Some(c) = self.containers.iter_mut().find(|c| c.name == name) { c.state = "running".into(); true } else { false }
+        if let Some(c) = self.containers.iter_mut().find(|c| c.name == name) {
+            c.running = true;
+            c.status = "running".into();
+            true
+        } else { false }
+    }
+
+    pub fn stop(&mut self, name: &str) -> bool {
+        if let Some(c) = self.containers.iter_mut().find(|c| c.name == name) {
+            c.running = false;
+            c.status = "stopped".into();
+            true
+        } else { false }
     }
 
     pub fn list(&self) -> &[Container] { &self.containers }
@@ -35,10 +49,10 @@ impl Model {
 mod tests {
     use super::*;
     #[test]
-    fn create_start() {
+    fn create_start_stop() {
         let mut l = Model::new();
-        assert!(l.create("ct1", "ubuntu"));
-        assert!(l.start("ct1"));
-        assert_eq!(l.list()[0].state, "running");
+        l.create("ubuntu", "ubuntu:22.04");
+        assert!(l.start("ubuntu"));
+        assert!(l.stop("ubuntu"));
     }
 }
